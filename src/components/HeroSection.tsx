@@ -12,16 +12,16 @@ const HeroSection = () => {
     offset: ["start start", "end start"],
   });
 
-  // Smooth parallax
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+  // 🌌 Parallax
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
   return (
     <section
       ref={ref}
-      className="relative min-h-[90vh] flex items-center justify-center overflow-hidden"
+      className="relative min-h-[90vh] flex items-center overflow-hidden"
     >
-      {/* 🌌 Background Image (Parallax) */}
+      {/* 🌄 Background */}
       <motion.img
         src={heroBg}
         alt="Hero background"
@@ -29,85 +29,77 @@ const HeroSection = () => {
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* 🌫️ Soft Gradient Overlay (Apple style) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-transparent" />
+      {/* 🌑 Overlay */}
+      <div className="absolute inset-0 bg-black/50" />
 
-      {/* ✨ Glass Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="
-          relative z-10 
-          text-center 
-          px-8 py-12 md:px-16 md:py-16 
-          max-w-2xl mx-4 
-          rounded-[2rem] 
-          border border-white/20 
-          backdrop-blur-md
-          shadow-[0_8px_40px_rgba(0,0,0,0.25)]
-        "
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05))",
-        }}
-      >
-        {/* 🌈 Subtle Glow Layer */}
-        <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-purple-500/20 via-transparent to-indigo-500/20 blur-2xl opacity-60" />
-
-        {/* Content */}
-        <div className="relative z-10">
+      {/* 🚀 Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full grid md:grid-cols-2 gap-10 items-center">
+        {/* ✨ LEFT TEXT */}
+        <motion.div
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 5, repeat: Infinity }}
+        >
+          {/* 🔥 Animated Heading */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-5"
+            className="text-5xl md:text-7xl font-bold leading-tight"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: {
+                transition: {
+                  staggerChildren: 0.15,
+                },
+              },
+            }}
           >
-            Discover Your Style
+            {["Elevate", "Your", "Style"].map((word, i) => (
+              <motion.span
+                key={i}
+                variants={{
+                  hidden: { opacity: 0, y: 50 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="inline-block mr-3"
+              >
+                <span className="bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent animate-pulse">
+                  {word}
+                </span>
+              </motion.span>
+            ))}
           </motion.h1>
 
+          {/* ✨ Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-base md:text-lg text-white/80 mb-10"
+            transition={{ delay: 0.6 }}
+            className="text-white/70 mt-6 text-lg max-w-md leading-relaxed"
           >
-            Shop premium collections for Men, Women, and Kids with exclusive
-            drops every week.
+            Discover fashion that speaks confidence. Curated collections
+            designed for modern lifestyle.
           </motion.p>
 
-          <Link to="/categories">
-            <motion.button
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              whileHover={{ scale: 1.06 }}
-              whileTap={{ scale: 0.95 }}
-              className="
-                relative 
-                px-8 py-4 
-                rounded-xl 
-                text-lg font-semibold 
-                text-white 
-                overflow-hidden
-                bg-white/10 
-                backdrop-blur-md 
-                border border-white/20
-                hover:bg-white/20
-                transition-all
-                inline-flex items-center gap-2
-              "
-            >
-              {/* Button glow */}
-              <span className="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-indigo-500/30 opacity-0 hover:opacity-100 transition" />
+          {/* 🚀 CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="mt-8"
+          >
+            <Link to="/categories">
+              <button className="group px-6 py-3 bg-white text-black rounded-full flex items-center gap-2 hover:gap-4 transition-all shadow-lg hover:shadow-xl">
+                Shop Now
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
+              </button>
+            </Link>
+          </motion.div>
+        </motion.div>
 
-              <span className="relative z-10 flex items-center gap-2">
-                Shop Now <ArrowRight className="w-5 h-5" />
-              </span>
-            </motion.button>
-          </Link>
-        </div>
-      </motion.div>
+        {/* 🎯 RIGHT SIDE (optional future image/model) */}
+        <div className="hidden md:block" />
+      </div>
     </section>
   );
 };
