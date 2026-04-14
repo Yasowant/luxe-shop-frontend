@@ -132,10 +132,6 @@ const Login = () => {
           </div>
 
           <div className="text-center space-y-2">
-            <p className="text-xs text-muted-foreground">
-              Demo: <strong>admin@luxe.com / admin123</strong> (admin) or{" "}
-              <strong>user@luxe.com / user123</strong>
-            </p>
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
               <Link
