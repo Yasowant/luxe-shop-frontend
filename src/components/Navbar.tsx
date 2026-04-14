@@ -36,6 +36,7 @@ const Navbar = () => {
   const links = [
     { label: "Home", to: "/" },
     { label: "Categories", to: "/categories" },
+    ...(user && !isAdmin ? [{ label: "Profile", to: "/profile" }] : []),
     ...(isAdmin ? [{ label: "Dashboard", to: "/dashboard" }] : []),
   ];
 
@@ -105,7 +106,7 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-2">
               <span className="flex items-center gap-1.5 text-sm font-medium bg-secondary/50 px-3 py-1.5 rounded-2xl">
                 <User size={14} />
-                {/* {user.name} */}
+                {user.name}
                 {isAdmin && (
                   <span className="text-xs gradient-primary text-primary-foreground px-1.5 py-0.5 rounded-md ml-1">
                     Admin
@@ -180,7 +181,7 @@ const Navbar = () => {
                   }}
                   className="text-sm font-medium py-2 text-destructive text-left"
                 >
-                  {/* Logout ({user.name}) */}
+                  Logout ({user.name})
                 </button>
               ) : (
                 <Link

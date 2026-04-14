@@ -10,6 +10,8 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface RegisterResponse {
@@ -35,4 +37,17 @@ export interface JwtPayload {
   role: string;
   iat: number;
   exp: number;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  isAdmin: boolean;
+  logout: () => void;
+  setUser: (user: User | null) => void;
+}
+
+export interface GetUsersResponse {
+  message: string;
+  count: number;
+  users: User[];
 }
