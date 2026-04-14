@@ -1,32 +1,36 @@
+import { getMe } from "@/services/authService";
+import { AuthContextType, User } from "@/types/auth";
 import { createContext, useContext, useState, useEffect } from "react";
-
-interface User {
-  id: string;
-  email: string;
-  role: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  isAdmin: boolean;
-  logout: () => void;
-}
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  // 🔥 LOAD USER FROM LOCALSTORAGE
+  // ✅ Load user ONLY if token exists
   useEffect(() => {
-    const stored = localStorage.getItem("luxe_user");
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
+    const loadUser = async () => {
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) return; // 🔥 FIX: prevent 401
+
+      try {
+        const data = await getMe();
+        setUser(data.user);
+      } catch (err) {
+        console.error("Auth failed", err);
+        setUser(null);
+
+        // cleanup
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+      }
+    };
+
+    loadUser();
   }, []);
 
   const logout = () => {
-    localStorage.removeItem("luxe_user");
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     setUser(null);
@@ -35,7 +39,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isAdmin = user?.role === "admin";
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, logout }}>
+    <AuthContext.Provider value={{ user, isAdmin, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

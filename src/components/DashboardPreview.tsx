@@ -1,26 +1,68 @@
 import { motion } from "framer-motion";
 import { Package, ShoppingBag, DollarSign, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
 
 const stats = [
-  { label: "Total Products", value: 1248, icon: Package, color: "text-primary" },
+  {
+    label: "Total Products",
+    value: 1248,
+    icon: Package,
+    color: "text-primary",
+  },
   { label: "Orders", value: 856, icon: ShoppingBag, color: "text-accent" },
-  { label: "Revenue", value: 48520, icon: DollarSign, color: "text-primary", prefix: "$" },
-  { label: "Growth", value: 24, icon: TrendingUp, color: "text-accent", suffix: "%" },
+  {
+    label: "Revenue",
+    value: 48520,
+    icon: DollarSign,
+    color: "text-primary",
+    prefix: "$",
+  },
+  {
+    label: "Growth",
+    value: 24,
+    icon: TrendingUp,
+    color: "text-accent",
+    suffix: "%",
+  },
 ];
 
 const barData = [
-  { name: "Mon", sales: 40 }, { name: "Tue", sales: 65 }, { name: "Wed", sales: 50 },
-  { name: "Thu", sales: 80 }, { name: "Fri", sales: 70 }, { name: "Sat", sales: 90 }, { name: "Sun", sales: 55 },
+  { name: "Mon", sales: 40 },
+  { name: "Tue", sales: 65 },
+  { name: "Wed", sales: 50 },
+  { name: "Thu", sales: 80 },
+  { name: "Fri", sales: 70 },
+  { name: "Sat", sales: 90 },
+  { name: "Sun", sales: 55 },
 ];
 
 const lineData = [
-  { name: "Jan", revenue: 4000 }, { name: "Feb", revenue: 3000 }, { name: "Mar", revenue: 5000 },
-  { name: "Apr", revenue: 4500 }, { name: "May", revenue: 6000 }, { name: "Jun", revenue: 5500 },
+  { name: "Jan", revenue: 4000 },
+  { name: "Feb", revenue: 3000 },
+  { name: "Mar", revenue: 5000 },
+  { name: "Apr", revenue: 4500 },
+  { name: "May", revenue: 6000 },
+  { name: "Jun", revenue: 5500 },
 ];
 
-const AnimatedCounter = ({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) => {
+const AnimatedCounter = ({
+  value,
+  prefix = "",
+  suffix = "",
+}: {
+  value: number;
+  prefix?: string;
+  suffix?: string;
+}) => {
   const [count, setCount] = useState(0);
   useEffect(() => {
     const duration = 1500;
@@ -38,7 +80,13 @@ const AnimatedCounter = ({ value, prefix = "", suffix = "" }: { value: number; p
     }, duration / steps);
     return () => clearInterval(timer);
   }, [value]);
-  return <span>{prefix}{count.toLocaleString()}{suffix}</span>;
+  return (
+    <span>
+      {prefix}
+      {count.toLocaleString()}
+      {suffix}
+    </span>
+  );
 };
 
 const DashboardPreview = () => {
@@ -66,7 +114,11 @@ const DashboardPreview = () => {
             >
               <s.icon size={24} className={`${s.color} mb-3`} />
               <div className="text-2xl font-bold animate-count-up">
-                <AnimatedCounter value={s.value} prefix={s.prefix} suffix={s.suffix} />
+                <AnimatedCounter
+                  value={s.value}
+                  prefix={s.prefix}
+                  suffix={s.suffix}
+                />
               </div>
               <p className="text-sm text-muted-foreground">{s.label}</p>
             </motion.div>
@@ -83,9 +135,17 @@ const DashboardPreview = () => {
             <h3 className="font-semibold mb-4">Weekly Sales</h3>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={barData}>
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <XAxis
+                  dataKey="name"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <Bar dataKey="sales" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                <Bar
+                  dataKey="sales"
+                  fill="hsl(var(--primary))"
+                  radius={[6, 6, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </motion.div>
@@ -99,9 +159,19 @@ const DashboardPreview = () => {
             <h3 className="font-semibold mb-4">Revenue Trend</h3>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={lineData}>
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <XAxis
+                  dataKey="name"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <Line type="monotone" dataKey="revenue" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ fill: "hsl(var(--accent))" }} />
+                <Line
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="hsl(var(--accent))"
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--accent))" }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </motion.div>

@@ -1,36 +1,40 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { toast } from "sonner";
 
-export interface Product {
-  id: string;
-  image: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  rating: number;
-  category: string;
-  description?: string;
+// =============================
+// TYPES
+// =============================
+export interface CartItem {
+  productId: string;
+  quantity: number;
 }
 
-interface CartItem {
-  product: Product;
-  quantity: number;
+interface AddToCartProduct {
+  _id: string;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product) => void;
+  addToCart: (product: AddToCartProduct) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
-  totalPrice: number;
   wishlist: string[];
   toggleWishlist: (productId: string) => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
 
+// =============================
+// PROVIDER
+// =============================
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem("luxe_cart");
@@ -42,6 +46,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // =============================
+  // SAVE TO LOCAL STORAGE
+  // =============================
   useEffect(() => {
     localStorage.setItem("luxe_cart", JSON.stringify(items));
   }, [items]);
@@ -50,40 +57,52 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem("luxe_wishlist", JSON.stringify(wishlist));
   }, [wishlist]);
 
-  const addToCart = (product: Product) => {
+  // =============================
+  // ADD TO CART
+  // =============================
+  const addToCart = (product: AddToCartProduct) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
+      const existing = prev.find((i) => i.productId === product._id);
+
       if (existing) {
-        toast.success(`Updated "${product.name}" quantity`);
         return prev.map((i) =>
-          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.productId === product._id ? { ...i, quantity: i.quantity + 1 } : i,
         );
       }
-      toast.success(`"${product.name}" added to cart`);
-      return [...prev, { product, quantity: 1 }];
+
+      toast.success("Added to cart");
+      return [...prev, { productId: product._id, quantity: 1 }];
     });
   };
 
+  // =============================
+  // REMOVE
+  // =============================
   const removeFromCart = (productId: string) => {
-    setItems((prev) => prev.filter((i) => i.product.id !== productId));
-    toast.info("Item removed from cart");
+    setItems((prev) => prev.filter((i) => i.productId !== productId));
+    toast.info("Item removed");
   };
 
+  // =============================
+  // UPDATE
+  // =============================
   const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity < 1) {
-      removeFromCart(productId);
-      return;
-    }
     setItems((prev) =>
-      prev.map((i) => (i.product.id === productId ? { ...i, quantity } : i))
+      prev.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
     );
   };
 
+  // =============================
+  // CLEAR
+  // =============================
   const clearCart = () => {
     setItems([]);
     toast.info("Cart cleared");
   };
 
+  // =============================
+  // WISHLIST
+  // =============================
   const toggleWishlist = (productId: string) => {
     setWishlist((prev) => {
       if (prev.includes(productId)) {
@@ -96,17 +115,26 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
 
   return (
     <CartContext.Provider
-      value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice, wishlist, toggleWishlist }}
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        totalItems,
+        wishlist,
+        toggleWishlist,
+      }}
     >
       {children}
     </CartContext.Provider>
   );
 };
 
+// =============================
 export const useCart = () => {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error("useCart must be used within CartProvider");

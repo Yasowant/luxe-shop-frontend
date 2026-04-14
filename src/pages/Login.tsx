@@ -4,8 +4,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
-import { loginUser } from "@/services/authService";
-import { JwtPayload } from "@/types/auth";
+import { getMe, loginUser } from "@/services/authService";
 
 const Login = () => {
   const [showPw, setShowPw] = useState(false);
@@ -14,23 +13,28 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const { setUser } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
+      // ✅ 1. Login
       const data = await loginUser({ email, password });
 
+      // ✅ 2. Store tokens
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
 
-      const base64Payload = data.accessToken.split(".")[1];
-      const user: JwtPayload = JSON.parse(atob(base64Payload));
+      // ✅ 3. Fetch real user from backend
+      const me = await getMe();
 
-      localStorage.setItem("luxe_user", JSON.stringify(user));
+      // ✅ 4. Update context (NO reload needed)
+      setUser(me.user);
 
-      navigate(user.role === "admin" ? "/dashboard" : "/");
-      window.location.reload();
+      // ✅ 5. Redirect
+      navigate(me.user.role === "admin" ? "/dashboard" : "/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
