@@ -4,25 +4,39 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
+import { loginUser } from "@/services/authService";
+import { JwtPayload } from "@/types/auth";
 
 const Login = () => {
   const [showPw, setShowPw] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    const result = login(email, password);
-    if (result.success) {
-      const saved = localStorage.getItem("luxe_user");
-      const user = saved ? JSON.parse(saved) : null;
-      navigate(user?.role === "admin" ? "/dashboard" : "/");
-    } else {
-      setError(result.error || "Login failed");
+
+    try {
+      const data = await loginUser({ email, password });
+
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
+
+      const base64Payload = data.accessToken.split(".")[1];
+      const user: JwtPayload = JSON.parse(atob(base64Payload));
+
+      localStorage.setItem("luxe_user", JSON.stringify(user));
+
+      navigate(user.role === "admin" ? "/dashboard" : "/");
+      window.location.reload();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed");
+      }
     }
   };
 
@@ -38,7 +52,9 @@ const Login = () => {
         >
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gradient">Welcome Back</h1>
-            <p className="text-muted-foreground text-sm mt-1">Sign in to your account</p>
+            <p className="text-muted-foreground text-sm mt-1">
+              Sign in to your account
+            </p>
           </div>
 
           <AnimatePresence>
@@ -59,15 +75,33 @@ const Login = () => {
               <label className="text-sm font-medium">Email</label>
               <div className="flex items-center gap-2 rounded-2xl bg-secondary/50 px-3 py-2.5 focus-within:glow-primary focus-within:ring-1 focus-within:ring-primary/30 transition-shadow">
                 <Mail size={16} className="text-muted-foreground" />
-                <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-transparent text-sm outline-none" required />
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-transparent text-sm outline-none"
+                  required
+                />
               </div>
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium">Password</label>
               <div className="flex items-center gap-2 rounded-2xl bg-secondary/50 px-3 py-2.5 focus-within:glow-primary focus-within:ring-1 focus-within:ring-primary/30 transition-shadow">
                 <Lock size={16} className="text-muted-foreground" />
-                <input type={showPw ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-transparent text-sm outline-none" required />
-                <button type="button" onClick={() => setShowPw(!showPw)} className="text-muted-foreground">
+                <input
+                  type={showPw ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-transparent text-sm outline-none"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="text-muted-foreground"
+                >
                   {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
@@ -78,7 +112,9 @@ const Login = () => {
                 <input type="checkbox" className="rounded border-border" />
                 <span className="text-muted-foreground">Remember me</span>
               </label>
-              <a href="#" className="text-primary hover:underline">Forgot?</a>
+              <a href="#" className="text-primary hover:underline">
+                Forgot?
+              </a>
             </div>
 
             <motion.button
@@ -93,11 +129,17 @@ const Login = () => {
 
           <div className="text-center space-y-2">
             <p className="text-xs text-muted-foreground">
-              Demo: <strong>admin@luxe.com / admin123</strong> (admin) or <strong>user@luxe.com / user123</strong>
+              Demo: <strong>admin@luxe.com / admin123</strong> (admin) or{" "}
+              <strong>user@luxe.com / user123</strong>
             </p>
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link to="/register" className="text-primary hover:underline font-medium">Sign Up</Link>
+              <Link
+                to="/register"
+                className="text-primary hover:underline font-medium"
+              >
+                Sign Up
+              </Link>
             </p>
           </div>
         </motion.form>
